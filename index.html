@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Talooren — AI-инженер / системный архитектор</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Manrope:wght@400;500;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg: #12151A;
+    --panel: #171B21;
+    --panel-hover: #1C2129;
+    --line: #262C35;
+    --line-soft: #1E232B;
+    --text: #D8DEE6;
+    --muted: #7C8896;
+    --dim: #545E6B;
+    --signal: #4FD1A5;
+    --signal-dim: #2E7A5C;
+    --amber: #E6A23C;
+    --red: #E0685A;
+    --mono: 'JetBrains Mono', ui-monospace, monospace;
+    --sans: 'Manrope', system-ui, sans-serif;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  html{scroll-behavior:smooth;}
+  body{
+    background:var(--bg);
+    color:var(--text);
+    font-family:var(--sans);
+    line-height:1.55;
+    -webkit-font-smoothing:antialiased;
+  }
+  a{color:inherit;}
+  ::selection{background:var(--signal-dim); color:#fff;}
+  .wrap{max-width:920px; margin:0 auto; padding:0 24px;}
+  .topbar{border-bottom:1px solid var(--line-soft); padding:18px 0; position:sticky; top:0; z-index:10; background:rgba(18,21,26,0.92); backdrop-filter:blur(6px);}
+  .topbar .wrap{display:flex; justify-content:space-between; align-items:center;}
+  .brand{font-family:var(--mono); font-size:14px; color:var(--muted);}
+  .brand b{color:var(--text); font-weight:500;}
+  .status-dot{display:inline-block; width:7px; height:7px; border-radius:50%; background:var(--signal); margin-right:8px; box-shadow:0 0 6px var(--signal);}
+  .hero{padding:64px 0 40px;}
+  .term{background:var(--panel); border:1px solid var(--line); border-radius:6px; overflow:hidden;}
+  .term-head{display:flex; align-items:center; gap:8px; padding:10px 14px; border-bottom:1px solid var(--line); font-family:var(--mono); font-size:12px; color:var(--dim);}
+  .term-dot{width:9px; height:9px; border-radius:50%; background:var(--line);}
+  .term-body{padding:22px 24px 26px; font-family:var(--mono); font-size:13.5px; color:var(--muted);}
+  .term-line{white-space:pre-wrap; margin-bottom:3px;}
+  .term-line .k{color:var(--signal);}
+  .term-line .v{color:var(--text);}
+  h1.name{font-family:var(--sans); font-weight:800; font-size:40px; letter-spacing:-0.01em; margin:28px 0 6px; color:#fff;}
+  .role{font-size:17px; color:var(--muted); max-width:60ch;}
+  .role b{color:var(--signal); font-weight:600;}
+  .quicklinks{display:flex; gap:18px; margin-top:22px; flex-wrap:wrap; font-family:var(--mono); font-size:13px;}
+  .quicklinks a{color:var(--muted); border-bottom:1px solid var(--line); padding-bottom:2px; transition:color .15s, border-color .15s;}
+  .quicklinks a:hover{color:var(--signal); border-color:var(--signal-dim);}
+  .section{padding:52px 0;}
+  .section + .section{border-top:1px solid var(--line-soft);}
+  .sec-head{display:flex; align-items:baseline; gap:12px; margin-bottom:28px;}
+  .sec-head .tag{font-family:var(--mono); font-size:12px; color:var(--dim);}
+  .sec-head h2{font-size:22px; font-weight:800; color:#fff;}
+  .sec-note{font-size:14.5px; color:var(--muted); max-width:70ch; margin:-16px 0 28px;}
+  .proj{border:1px solid var(--line); border-radius:6px; background:var(--panel); margin-bottom:14px; overflow:hidden; transition:border-color .15s, background .15s;}
+  .proj:hover{border-color:#333b46; background:var(--panel-hover);}
+  .proj-head{display:flex; align-items:flex-start; gap:14px; padding:18px 20px;}
+  .proj-status{font-family:var(--mono); font-size:13px; line-height:1.9; flex-shrink:0; width:14px; text-align:center; margin-top:2px;}
+  .st-live{color:var(--signal);}
+  .st-progress{color:var(--amber);}
+  .st-archive{color:var(--dim);}
+  .proj-main{flex:1; min-width:0;}
+  .proj-title-row{display:flex; align-items:center; gap:10px; flex-wrap:wrap; margin-bottom:5px;}
+  .proj-title{font-family:var(--mono); font-weight:700; font-size:15.5px; color:#fff;}
+  .proj-badge{font-family:var(--mono); font-size:10.5px; padding:2px 7px; border-radius:3px; border:1px solid var(--line); color:var(--muted); letter-spacing:0.02em;}
+  .proj-desc{font-size:14.5px; color:var(--muted); margin-bottom:11px; max-width:66ch;}
+  .proj-stack{display:flex; flex-wrap:wrap; gap:6px; margin-bottom:11px;}
+  .chip{font-family:var(--mono); font-size:11.5px; color:#9aa5b1; background:#14181e; border:1px solid var(--line-soft); padding:3px 8px; border-radius:4px;}
+  .proj-detail{font-size:13.5px; color:var(--dim); border-left:2px solid var(--line); padding-left:12px; margin-bottom:12px;}
+  .proj-links{display:flex; gap:16px; font-family:var(--mono); font-size:12.5px;}
+  .proj-links a{color:var(--signal); text-decoration:none;}
+  .proj-links a:hover{text-decoration:underline;}
+  .proj-links span.disabled{color:var(--dim);}
+  .skillgrid{display:flex; flex-direction:column; gap:14px;}
+  .skillblock{border:1px solid var(--line); border-radius:6px; background:var(--panel); padding:16px 20px;}
+  .skillblock-head{margin-bottom:11px;}
+  .skillblock-role{font-family:var(--mono); font-weight:700; font-size:13.5px; color:var(--signal);}
+  .unmatched{font-family:var(--mono); font-size:13px; width:100%; border-collapse:collapse;}
+  .unmatched td{padding:9px 4px; border-bottom:1px solid var(--line-soft); color:var(--muted);}
+  .unmatched td:first-child{color:var(--text); width:40%;}
+  footer{padding:40px 0 60px; border-top:1px solid var(--line-soft);}
+  footer .wrap{display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:14px;}
+  .foot-meta{font-family:var(--mono); font-size:12.5px; color:var(--dim);}
+  .foot-links{display:flex; gap:18px; font-family:var(--mono); font-size:13px;}
+  .foot-links a{color:var(--muted);}
+  .foot-links a:hover{color:var(--signal);}
+  @media (max-width:640px){h1.name{font-size:30px;}.term-body{font-size:12px;}.proj-head{flex-direction:column;}.proj-status{width:auto;}}
+  @media (prefers-reduced-motion: reduce){html{scroll-behavior:auto;}}
+</style>
+</head>
+<body>
+<div class="topbar">
+  <div class="wrap">
+    <div class="brand"><span class="status-dot"></span><b>talooren</b> — portfolio.log</div>
+    <div class="brand">Калининградская обл.</div>
+  </div>
+</div>
+<div class="wrap">
+  <section class="hero">
+    <div class="term">
+      <div class="term-head"><span class="term-dot"></span><span class="term-dot"></span><span class="term-dot"></span>&nbsp;whoami</div>
+      <div class="term-body">
+        <div class="term-line"><span class="k">$</span> <span class="v">cat profile.log</span></div>
+        <div class="term-line">роль: <span class="v">системный администратор → AI-инженер</span></div>
+        <div class="term-line">опыт: <span class="v">эксплуатация ИТ-инфраструктуры, оркестрация AI-агентов</span></div>
+        <div class="term-line">стек ИИ: <span class="v">Claude / OpenRouter / LangGraph / RAG / n8n</span></div>
+        <div class="term-line">репозиториев: <span class="v">11</span> · рабочих продакшн-систем: <span class="v">4</span></div>
+      </div>
+    </div>
+    <h1 class="name">Talooren</h1>
+    <p class="role">Системный администратор с опытом поддержки защищённой ИТ-инфраструктуры, сейчас закрывающий недостающие звенья стека <b>практическими рабочими проектами</b> — от RAG и LangGraph-агентов до low-code автоматизации на n8n. Ниже — не питчи, а честный статус каждого репозитория.</p>
+    <div class="quicklinks">
+      <a href="#stack">Стек и роли →</a>
+      <a href="#mini">Мини-проекты стека →</a>
+      <a href="#main">Продакшн-системы →</a>
+      <a href="#landing">Лендинги / GEO →</a>
+      <a href="https://github.com/Talooren" target="_blank" rel="noopener">github.com/Talooren →</a>
+    </div>
+  </section>
+  <section class="section" id="stack">
+    <div class="sec-head"><span class="tag">00</span><h2>Стек и роли</h2></div>
+    <div class="skillgrid">
+      <div class="skillblock">
+        <div class="skillblock-head"><span class="skillblock-role">AI / LLM Engineer</span></div>
+        <div class="proj-stack"><span class="chip">LangGraph (stateful-агенты, циклы, conditional routing)</span><span class="chip">RAG / retrieval (TF-IDF, cosine similarity)</span><span class="chip">Anthropic Claude API</span><span class="chip">OpenRouter (мультимодельный роутинг)</span><span class="chip">Промпт-инжиниринг</span><span class="chip">ChromaDB (векторная память)</span><span class="chip">n8n (low-code AI-оркестрация)</span></div>
+      </div>
+      <div class="skillblock">
+        <div class="skillblock-head"><span class="skillblock-role">AI Orchestration / Agent Ops</span></div>
+        <div class="proj-stack"><span class="chip">Оркестрация Claude Code / OpenClaw</span><span class="chip">Мультиагентные системы (multi-brain)</span><span class="chip">Постановка задач AI-агентам и приёмка результата</span><span class="chip">Fallback-цепочки между LLM-провайдерами</span><span class="chip">Trust-модели и поведенческие модули агентов</span></div>
+      </div>
+      <div class="skillblock">
+        <div class="skillblock-head"><span class="skillblock-role">Backend / Python</span></div>
+        <div class="proj-stack"><span class="chip">Python 3.10–3.12</span><span class="chip">aiogram 3 (Telegram-боты)</span><span class="chip">asyncpg / Neon Postgres</span><span class="chip">Redis</span><span class="chip">APScheduler</span><span class="chip">pandas / numpy / SciPy</span><span class="chip">Docker / systemd</span></div>
+      </div>
+      <div class="skillblock">
+        <div class="skillblock-head"><span class="skillblock-role">QA / AI Audit</span></div>
+        <div class="proj-stack"><span class="chip">Аудит AI-контентных систем</span><span class="chip">Структурированные отчёты по требованиям (ТЗ)</span><span class="chip">Проверка воспроизводимости результата</span><span class="chip">Security-review кода и архитектуры</span></div>
+      </div>
+      <div class="skillblock">
+        <div class="skillblock-head"><span class="skillblock-role">Mobile / Security</span></div>
+        <div class="proj-stack"><span class="chip">Kotlin / Android SDK / MVVM</span><span class="chip">On-device LLM (LiteRT-LM)</span><span class="chip">SQLCipher / шифрование данных</span><span class="chip">Offline-first архитектура</span></div>
+      </div>
+      <div class="skillblock">
+        <div class="skillblock-head"><span class="skillblock-role">Инфраструктура</span></div>
+        <div class="proj-stack"><span class="chip">VPS / Linux-администрирование</span><span class="chip">SSH / Termius</span><span class="chip">WireGuard VPN</span><span class="chip">CI по факту (деплой на GitHub Pages)</span></div>
+      </div>
+    </div>
+  </section>
+  <script type="application/ld+json">
+  {"@context":"https://schema.org","@type":"Person","name":"Talooren","jobTitle":"AI Engineer / AI Orchestration Specialist","addressRegion":"Калининградская область","addressCountry":"RU","knowsAbout":["LangGraph","Retrieval-Augmented Generation","Anthropic Claude API","OpenRouter","Prompt Engineering","n8n workflow automation","AI agent orchestration","Claude Code","Multi-agent systems","Python","aiogram","PostgreSQL","Redis","Docker","AI content system audit","QA for AI systems","Android development","Kotlin","On-device LLM inference","Telegram bot development","System administration","Linux"],"hasOccupation":[{"@type":"Occupation","name":"AI/LLM Engineer"},{"@type":"Occupation","name":"AI Orchestration Specialist"},{"@type":"Occupation","name":"AI Systems QA Auditor"},{"@type":"Occupation","name":"Backend Developer (Python)"}]}
+  </script>
+  <section class="section" id="mini">
+    <div class="sec-head"><span class="tag">01</span><h2>Мини-проекты: закрытие пробелов в стеке</h2></div>
+    <p class="sec-note">Три небольших, но полностью реальных проекта — собраны специально, чтобы на практике закрыть конкретные технологии (RAG-retrieval, stateful-агенты, no-code оркестрация), которых не было в основной практике. Каждый — честно ограничен по объёму и задокументирован, без имитации результатов.</p>
+    <div class="proj">
+      <div class="proj-head"><div class="proj-status st-live" title="Готов">●</div><div class="proj-main">
+        <div class="proj-title-row"><span class="proj-title">n8n-rss-digest</span><span class="proj-badge">публичный</span></div>
+        <p class="proj-desc">RSS-лента Habr → саммари статей через LLM → публикация в Telegram-канал. Полный цикл: получение, парсинг, дедупликация, генерация, доставка.</p>
+        <div class="proj-stack"><span class="chip">n8n Cloud</span><span class="chip">OpenRouter · qwen3-coder</span><span class="chip">Telegram Bot API</span><span class="chip">JS (Code node)</span><span class="chip">Data Table (dedup)</span></div>
+        <div class="proj-detail">В процессе сборки найдены и обойдены два реальных бага платформы n8n: встроенная RSS-нода ломает кириллицу без возможности починки (заменена на HTTP Request + собственный regex-парсер XML), и HTTP-нода в режиме JSON+Expression отправляет тело запроса строкой, а не объектом (обойдено через предварительное экранирование в Code-ноде).</div>
+        <div class="proj-links"><a href="https://github.com/Talooren/n8n-rss-digest" target="_blank" rel="noopener">репозиторий →</a><span class="disabled">демо: приватный Telegram-канал</span></div>
+      </div></div>
+    </div>
+    <div class="proj">
+      <div class="proj-head"><div class="proj-status st-live" title="Рабочий CLI">●</div><div class="proj-main">
+        <div class="proj-title-row"><span class="proj-title">langgraph-research-agent</span><span class="proj-badge">публичный</span><span class="proj-badge">Pages ✓</span></div>
+        <p class="proj-desc">Stateful research-агент на LangGraph: анализ запроса → поиск → оценка контекста → генерация ответа, с условным циклом переформулировки запроса при нехватке данных.</p>
+        <div class="proj-stack"><span class="chip">Python 3.11+</span><span class="chip">langgraph ≥0.2</span><span class="chip">langchain-openai</span><span class="chip">OpenRouter · qwen3-coder-next</span><span class="chip">TF-IDF retrieval</span></div>
+        <div class="proj-detail">Граф из 6 узлов с реальным циклом rewrite→search — не просто линейный пайплайн. Зафиксированный прогон: вопрос по внутренней документации TradeBot дал точный, обоснованный контекстом ответ с конкретными параметрами и путями к файлам. Trace выложен как безопасная для публикации статическая HTML-страница.</div>
+        <div class="proj-links"><a href="https://github.com/Talooren/langgraph-research-agent" target="_blank" rel="noopener">репозиторий →</a><a href="https://talooren.github.io/langgraph-research-agent/" target="_blank" rel="noopener">живой trace →</a></div>
+      </div></div>
+    </div>
+    <div class="proj">
+      <div class="proj-head"><div class="proj-status st-live" title="Демо">●</div><div class="proj-main">
+        <div class="proj-title-row"><span class="proj-title">rag-docs-search</span><span class="proj-badge">публичный</span><span class="proj-badge">Pages ✓</span></div>
+        <p class="proj-desc">Retrieval-слой RAG поверх документации собственных репозиториев: TF-IDF + косинусное сходство, полностью в браузере, без бэкенда и без LLM-вызовов.</p>
+        <div class="proj-stack"><span class="chip">Vanilla JS</span><span class="chip">TF-IDF / cosine similarity</span><span class="chip">GitHub Pages (static)</span></div>
+        <div class="proj-detail">Намеренно честная граница: generation-слой не подключён, потому что на статическом GitHub Pages негде безопасно спрятать API-ключ. Названо и подано как «retrieval-layer», а не как «RAG» — без переоценки того, что реально сделано.</div>
+        <div class="proj-links"><a href="https://github.com/Talooren/rag-docs-search" target="_blank" rel="noopener">репозиторий →</a><a href="https://talooren.github.io/rag-docs-search/" target="_blank" rel="noopener">демо →</a></div>
+      </div></div>
+    </div>
+  </section>
+  <section class="section" id="main">
+    <div class="sec-head"><span class="tag">02</span><h2>Продакшн-системы</h2></div>
+    <p class="sec-note">Более крупные системы, часть из них в приватных репозиториях (код остаётся закрытым по соображениям безопасности инфраструктуры или содержимого), но архитектура и технические решения — открытая часть портфолио.</p>
+    <div class="proj">
+      <div class="proj-head"><div class="proj-status st-live" title="Рабочий, PAPER/LIVE">●</div><div class="proj-main">
+        <div class="proj-title-row"><span class="proj-title">tradebot-backtest</span><span class="proj-badge">приватный</span></div>
+        <p class="proj-desc">Алгоритмическая торговая система для Bybit Spot: сбор рыночных данных, риск-менеджмент, walk-forward тестирование стратегий.</p>
+        <div class="proj-stack"><span class="chip">Python 3.11+</span><span class="chip">ccxt / pybit</span><span class="chip">pandas / numpy / SciPy</span><span class="chip">aiogram</span><span class="chip">Docker / systemd / VPS</span></div>
+        <div class="proj-detail">Собственные защитные механизмы: Near-SL Guard (уведомление при подходе цены к стоп-лоссу), D1 veto и sentiment-гейт по индексу страха и жадности, breadth-гейт CHOP/TREND для фильтрации рыночного режима. Риск ограничен 0,3% на сделку.</div>
+        <div class="proj-links"><span class="disabled">закрытый репозиторий — архитектура по запросу</span></div>
+      </div></div>
+    </div>
+    <div class="proj">
+      <div class="proj-head"><div class="proj-status st-progress" title="Фаза 2 из 8">◐</div><div class="proj-main">
+        <div class="proj-title-row"><span class="proj-title">myai-chat</span><span class="proj-badge">приватный</span></div>
+        <p class="proj-desc">Полностью офлайн Android-приложение для локального чата с LLM, спроектированное для использования в защищённой ИТ-инфраструктуре без выхода в сеть.</p>
+        <div class="proj-stack"><span class="chip">Kotlin / MVVM</span><span class="chip">Android SDK 35</span><span class="chip">LiteRT-LM · Gemma 4 E4B</span><span class="chip">SQLCipher</span></div>
+        <div class="proj-detail">Security-first архитектура: FLAG_SECURE, duress crypto-shred, dead man's switch (5-тап жест), минимум 16 символов в пассфразе, подтверждённая энтропия шифрования ~7.99 бит/байт на реальной БД чатов. APK уменьшен на 72% после удаления неиспользуемых ML-компонентов. Включает встроенную RAG-базу знаний сисадмина.</div>
+        <div class="proj-links"><span class="disabled">закрытый репозиторий — pre-release</span></div>
+      </div></div>
+    </div>
+    <div class="proj">
+      <div class="proj-head"><div class="proj-status st-archive" title="Архивный снапшот">○</div><div class="proj-main">
+        <div class="proj-title-row"><span class="proj-title">project-elina</span><span class="proj-badge">приватный</span></div>
+        <p class="proj-desc">AI-персонаж с устойчивой личностью в Telegram: память, диалог, генерация голоса и изображений, поведенческие модули для естественного темпа общения.</p>
+        <div class="proj-stack"><span class="chip">Python 3.10+ / aiogram 3</span><span class="chip">anthropic / openai</span><span class="chip">chromadb (память)</span><span class="chip">deepgram / fal-client</span><span class="chip">Docker</span></div>
+        <div class="proj-detail">Модель доверия (0–6) с fallback-цепочками между несколькими LLM-провайдерами, память на SQLite, второй вспомогательный агент. Разработан соло, полностью самостоятельная архитектура без готовых фреймворков.</div>
+        <div class="proj-links"><span class="disabled">закрытый репозиторий — архивный снапшот</span></div>
+      </div></div>
+    </div>
+    <div class="proj">
+      <div class="proj-head"><div class="proj-status st-live" title="Рабочий">●</div><div class="proj-main">
+        <div class="proj-title-row"><span class="proj-title">taskflow-scheduler-bot</span><span class="proj-badge">приватный</span></div>
+        <p class="proj-desc">Telegram-бот для распределения задач команды с интеграцией Airtable — координация удалённых исполнителей без ручного контроля дедлайнов.</p>
+        <div class="proj-stack"><span class="chip">Python 3.11+ / aiogram 3.7</span><span class="chip">asyncpg</span><span class="chip">redis (hiredis)</span><span class="chip">APScheduler</span><span class="chip">Docker</span></div>
+        <div class="proj-detail">Назначение исполнителя по принципу «первая реакция = взял задачу» (message_reaction), уведомления о простое (check_stale каждую минуту, порог 30 мин), режимы TEST_MODE / PRODUCTION, whitelist модераторов (MODERATOR_IDS).</div>
+        <div class="proj-links"><span class="disabled">закрытый репозиторий — архитектура по запросу</span></div>
+      </div></div>
+    </div>
+  </section>
+  <section class="section" id="landing">
+    <div class="sec-head"><span class="tag">03</span><h2>Лендинги / GEO</h2></div>
+    <div class="proj">
+      <div class="proj-head"><div class="proj-status st-live" title="Готов">●</div><div class="proj-main">
+        <div class="proj-title-row"><span class="proj-title">cargo39-landing</span><span class="proj-badge">приватный</span></div>
+        <p class="proj-desc">Лендинг для проекта импорта автомобилей из Азии в Калининградскую область с поэтапной оплатой и фотоотчётами.</p>
+        <div class="proj-stack"><span class="chip">HTML</span><span class="chip">Готовый демонстрационный материал</span></div>
+        <div class="proj-links"><span class="disabled">закрытый репозиторий — демо-материал</span></div>
+      </div></div>
+    </div>
+    <div class="proj">
+      <div class="proj-head"><div class="proj-status st-live" title="Готов">●</div><div class="proj-main">
+        <div class="proj-title-row"><span class="proj-title">vet-geo-demo</span><span class="proj-badge">публичный</span><span class="proj-badge">Pages ✓</span></div>
+        <p class="proj-desc">Демонстрационный лендинг методологии GEO-консалтинга для ветклиник — повышение видимости в локальном поиске (Яндекс, Google, Алиса, GigaChat) через schema.org-разметку.</p>
+        <div class="proj-stack"><span class="chip">HTML5 / CSS3</span><span class="chip">schema.org JSON-LD</span><span class="chip">GitHub Pages</span></div>
+        <div class="proj-links"><a href="https://github.com/Talooren/vet-geo-demo" target="_blank" rel="noopener">репозиторий →</a><a href="https://talooren.github.io/vet-geo-demo/" target="_blank" rel="noopener">демо →</a></div>
+      </div></div>
+    </div>
+    <div class="proj">
+      <div class="proj-head"><div class="proj-status st-progress" title="MVP">◐</div><div class="proj-main">
+        <div class="proj-title-row"><span class="proj-title">telegram-moderator-bot</span><span class="proj-badge">публичный</span></div>
+        <p class="proj-desc">Бот для приёма сообщений по шаблону, модерации в отдельном чате и публикации одобренных сообщений в целевой канал.</p>
+        <div class="proj-stack"><span class="chip">Python 3</span><span class="chip">aiogram 3</span><span class="chip">aiohttp (встроенный веб-сервер)</span><span class="chip">Regex-валидация</span></div>
+        <div class="proj-detail">Однофайловый MVP (~250 строк) — приём, модерация, публикация работают. Подходит как основа для доработки.</div>
+        <div class="proj-links"><a href="https://github.com/Talooren/telegram-moderator-bot" target="_blank" rel="noopener">репозиторий →</a></div>
+      </div></div>
+    </div>
+  </section>
+  <section class="section">
+    <div class="sec-head"><span class="tag">04</span><h2>Как я работаю</h2></div>
+    <p class="sec-note">Мои принципы при работе с AI-системами — не просто код, а надёжность и прозрачность.</p>
+    <div class="callout"><b>Оркестрация, а не ручное кодирование:</b> OpenClaw, Claude Code, LangGraph — оркеструю агентов, а не пишу код под каждый кейс. Проверка результата обязательна.</div>
+    <div class="callout"><b>Безопасность по умолчанию:</b> API-ключи только в env/Secrets, никаких hard-coded токенов, аудит безопасности — часть цикла.</div>
+    <div class="callout"><b>Честность в демонстрациях:</b> если не сделал generation-слой — не пишу "RAG", а называю "retrieval-layer". Никаких mock-демо.</div>
+  </section>
+  <table class="unmatched">
+    <thead><tr><td>Не вошло в портфолио</td><td>Почему</td></tr></thead>
+    <tr><td>Отдел XX / HR-автоматизация</td><td>Репозитория нет; концепция в Assistant Hub</td></tr>
+    <tr><td>AgentArena</td><td>Репозиторий недоступен на аккаунте (aidevas/agentarenatest)</td></tr>
+    <tr><td>Elina 2.0 / AI YouTube-канал</td><td>Только бриф/документ — кода нет</td></tr>
+    <tr><td>Off Grid RAG</td><td>Реализован внутри myai-chat — встроенная RAG-база</td></tr>
+  </table>
+  <footer>
+    <div class="wrap">
+      <div class="foot-meta">portfolio.log · обновлено 2026-09-19 · 11 репозиториев проверены по факту</div>
+      <div class="foot-links">
+        <a href="https://github.com/Talooren" target="_blank" rel="noopener">github.com/Talooren</a>
+        <a href="https://t.me/talooren" target="_blank" rel="noopener">t.me/talooren</a>
+      </div>
+    </div>
+  </footer>
+</div>
+</body>
+</html>
